@@ -3,14 +3,19 @@ from flask import Flask, session, request, redirect, url_for, render_template
 from spotipy import Spotify
 from spotipy.oauth2 import SpotifyOAuth
 from spotipy.cache_handler import FlaskSessionCacheHandler
+from get_artists import get_artists_blueprint
+from dotenv import load_dotenv
+from pathlib import Path
 
 app = Flask(__name__,  template_folder='templates')
 app.config['SECRET_KEY'] = os.urandom(64)
 
-_client_id = 'bca5251cd35842258f6b4390c653a2e1'
-_client_secret = '5466f21024b646b4834519d6b316b7bf'
-_redirect_uri = 'http://localhost:5000/callback'
-_scope = 'user-top-read'
+load_dotenv()
+
+_client_id = os.getenv("CLIENT_ID")
+_client_secret = os.getenv("CLIENT_SECRET")
+_redirect_uri = os.getenv("REDIRECT_URI")
+_scope = os.getenv("SCOPE")
 
 _cache_handler = FlaskSessionCacheHandler(session)
 sp_oauth = SpotifyOAuth(
@@ -44,23 +49,12 @@ def home():
         return redirect(auth_url)
     playlists = sp.current_user_top_artists(limit=5)
     print(playlists)
-    pInfo = [(pl['name']) for pl in playlists['items']]
-    playlists_html = '<br>'.join([f'{name[0]}' for name in pInfo])
-    artistInfo = sp.artist('2n2RSaZqBuUUukhbLlpnE6')
-    print(artistInfo['name'])
-    return render_template('index.html', indx=pInfo )
+    pInfo = [(pl['name'], pl['uri'][15:], pl['images'][0]['url']) for pl in playlists['items']]
+    print(sp.current_user())
+    return render_template('index.html', indx=pInfo, uName= sp.current_user()['display_name'])
 
-@app.route('/artistInfo')
-def artistInfo():
-    if not sp_oauth.validate_token(_cache_handler.get_cached_token()):
-        auth_url = sp_oauth.get_authorize_url()
-        return redirect(auth_url)
-    artistInfo = sp.artist('2n2RSaZqBuUUukhbLlpnE6')
-    print(artistInfo)
-    aInfo = artistInfo['name']
-    #playlists_html = '<br>'.join([f'{name[0]}' for name in pInfo])
-    return render_template('artist.html', artist = aInfo )
 
+app.register_blueprint(get_artists_blueprint)
 
 
 if __name__ == '__main__':
