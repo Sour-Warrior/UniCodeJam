@@ -31,6 +31,7 @@ def artistInfo(artist_id):
         auth_url = sp_oauth.get_authorize_url()
         return redirect(auth_url)
     artistInfo = sp.artist(artist_id)
+    artistAlbumInfo = sp.artist_albums(artist_id)['items']
     print(artistInfo)
     #playlists_html = '<br>'.join([f'{name[0]}' for name in pInfo])
-    return render_template('artist.html', artist = artistInfo )
+    return render_template('artist.html', artist = artistInfo, albums = artistAlbumInfo)
