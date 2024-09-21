@@ -12,6 +12,12 @@
         <div class="mx-auto ps-5" style="padding-bottom: 10px; padding-top: 10px;">
             <h1>Hello, {{uName}}</h1>
           </div>
+          <nav class="navbar navbar-light bg-light">
+            <form class="form-inline" method="post" action="{{url_for('search')}}">
+              <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" name="searched">
+              <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+            </form>
+          </nav>
           <div class="container-fluid padding-bottom: 10px">
             <div class="mx-auto ps-5" style="padding-bottom: 10px; padding-top: 10px;"></div>
               <h2>Your top artists</h2>
