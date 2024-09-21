@@ -44,14 +44,18 @@ def callback():
 
 @app.route('/home')
 def home():
+    # Handle token validation
     if not sp_oauth.validate_token(_cache_handler.get_cached_token()):
         auth_url = sp_oauth.get_authorize_url()
         return redirect(auth_url)
-    playlists = sp.current_user_top_artists(limit=5)
-    print(playlists)
-    pInfo = [(pl['name'], pl['uri'][15:], pl['images'][0]['url']) for pl in playlists['items']]
-    print(sp.current_user())
-    return render_template('index.html', indx=pInfo, uName= sp.current_user()['display_name'])
+    # Display user's top 5 artists
+    topArtists = sp.current_user_top_artists(limit=10, time_range="medium_term")
+    artistInfo = [(pl['name'], pl['uri'][15:], pl['images'][0]['url']) for pl in topArtists['items']]
+    # Display user's top 10 tracks
+    topTracks = sp.current_user_top_tracks(limit=10)
+    trackInfo = [(ti['name'], ti['album']['images'][0]['url']) for ti in topTracks['items']]
+    print(topTracks)
+    return render_template('index.html', indx=artistInfo, tracks=trackInfo, uName= sp.current_user()['display_name'])
 
 
 app.register_blueprint(get_artists_blueprint)
