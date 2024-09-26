@@ -1,4 +1,5 @@
 import os
+import json
 from flask import Flask, session, request, redirect, url_for, render_template
 from spotipy import Spotify
 from spotipy.oauth2 import SpotifyOAuth
@@ -36,9 +37,7 @@ sp_oauth = SpotifyOAuth(
 )
 sp = Spotify(auth_manager=sp_oauth)
 
-class SearchForm(FlaskForm):
-    search = StringField("search", validators=[DataRequired()])
-    submit = SubmitField("submit")
+search_categories = ['tracks', 'artists']
 
 @app.route('/')
 def login():
@@ -68,12 +67,15 @@ def home():
     for i in artistInfo:
         for j in i[3]:
             genres.append(j)
+    print(topArtists)
     count = pd.Series(genres).value_counts()
     print("Element Count")
     print(count)
     # Display user's top 10 tracks
     topTracks = sp.current_user_top_tracks(limit=10)
     trackInfo = [(ti['name'], ti['album']['images'][0]['url']) for ti in topTracks['items']]
+    print(artistInfo)
+    print(trackInfo)
     return render_template('index.html', indx=artistInfo, tracks=trackInfo, uName= sp.current_user()['display_name'])
 
 @app.route('/search', methods=["GET", "POST"])
@@ -82,6 +84,19 @@ def search():
     tracks = sp.search(content, type="track", limit=20)
     tracks = tracks['tracks']['items']
     return render_template('search_results.html', results = tracks)
+
+@app.route('/data', methods=["GET"])
+def data():
+    topArtists = sp.current_user_top_artists(limit=10, time_range="medium_term")
+    artistInfo = [(pl['name'], pl['uri'][15:], pl['images'][0]['url'], pl['genres']) for pl in topArtists['items']]
+    print(topArtists)
+    topTracks = sp.current_user_top_tracks(limit=10)
+    trackInfo = [(ti['name'], ti['album']['images'][0]['url']) for ti in topTracks['items']]
+    return {
+        'Name': sp.current_user()['display_name'], 
+        "artists": topArtists['items'],
+        "tracks": topTracks['items']
+        }
     
 
 
