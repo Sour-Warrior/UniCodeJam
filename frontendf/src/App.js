@@ -1,8 +1,11 @@
 import logo from './logo.svg';
 import './App.css';
 import React, { useState, useEffect } from "react"
+import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
+import {View} from 'react-native'
 
-function App() {
+
+const App = () => {
 
 
   const [data, setdata] = useState({
@@ -25,20 +28,31 @@ useEffect(() => {
             });
         })
     );
-    console.log(data.artists)
 }, []);
 
 let artistList = []
 
-data.artists.forEach((artist, index) => {artistList.push(<li key={index}>{artist.name}: {artist.genres[0]} + {artist.genres[1]}</li>)})
+data.artists.forEach((artist, index) => {artistList.push(
+        <View style={{flexDirection: "row",  justifyContent: 'space-between'}}>
+            <div class="col-2 mb-2">
+              <div class="card" style={{flex: 1}}>
+                <img src={artist.images[0].url} alt="Card image cap"/>
+                  <div class="card-body">
+                    <h5 class="card-title">{artist.name}</h5>
+                  </div>
+                </div>
+        </div>    
+        </View>
+)})
 
 return (
     <div className="App">
         <header className="App-header">
             <h1>React and flask</h1>
-            {/* Calling a data from setdata for showing */}
-            <ul>{artistList}</ul>
         </header>
+        <div>
+            {artistList}
+        </div>
     </div>
 );
 }

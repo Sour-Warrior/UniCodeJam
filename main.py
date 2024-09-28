@@ -60,7 +60,7 @@ def home():
         auth_url = sp_oauth.get_authorize_url()
         return redirect(auth_url)
     # Display user's top 5 artists
-    topArtists = sp.current_user_top_artists(limit=10, time_range="medium_term")
+    topArtists = sp.current_user_top_artists(limit=50, time_range="medium_term")
     artistInfo = [(pl['name'], pl['uri'][15:], pl['images'][0]['url'], pl['genres']) for pl in topArtists['items']]
     # Find and count genres of the top artists
     genres = []
@@ -72,7 +72,7 @@ def home():
     print("Element Count")
     print(count)
     # Display user's top 10 tracks
-    topTracks = sp.current_user_top_tracks(limit=10)
+    topTracks = sp.current_user_top_tracks(limit=50)
     trackInfo = [(ti['name'], ti['album']['images'][0]['url']) for ti in topTracks['items']]
     print(artistInfo)
     print(trackInfo)
@@ -87,10 +87,10 @@ def search():
 
 @app.route('/data', methods=["GET"])
 def data():
-    topArtists = sp.current_user_top_artists(limit=10, time_range="medium_term")
+    topArtists = sp.current_user_top_artists(limit=50, time_range="medium_term")
     artistInfo = [(pl['name'], pl['uri'][15:], pl['images'][0]['url'], pl['genres']) for pl in topArtists['items']]
     print(topArtists)
-    topTracks = sp.current_user_top_tracks(limit=10)
+    topTracks = sp.current_user_top_tracks(limit=50)
     trackInfo = [(ti['name'], ti['album']['images'][0]['url']) for ti in topTracks['items']]
     return {
         'Name': sp.current_user()['display_name'], 
